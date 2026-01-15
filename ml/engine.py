@@ -53,8 +53,34 @@ class DreamAnalysisEngine:
             | JsonOutputParser()
         )
 
+        # LCEL Chain 2: Weekly Pattern Aggregator
+        self.weekly_prompt = ChatPromptTemplate.from_template("""
+        Analyze this collection of dreams from the past week:
+        {dreams_json}
+        
+        Identify overarching psychological patterns:
+        1. Recurring Symbols and their evolving meaning.
+        2. Dominant Archetypes across all entries.
+        3. Psychological Growth or Regression trends.
+        4. Emotional Climate summary.
+        
+        Provide a deep psychological synthesis. Even if there are few dreams, analyze the core subconscious signals.
+        Return JSON: {{ "synthesis": "string", "patterns": ["string"], "archetypes": ["string"], "emotional_climate": "string" }}
+        """)
+
+        self.weekly_chain = (
+            {"dreams_json": RunnablePassthrough()}
+            | self.weekly_prompt
+            | self.llm
+            | JsonOutputParser()
+        )
+
     def analyze_dream(self, content):
         return self.analysis_chain.invoke(content)
+
+    def analyze_weekly(self, dreams):
+        dreams_json = json.dumps(dreams)
+        return self.weekly_chain.invoke(dreams_json)
 
 # Example Usage Bridge
 if __name__ == "__main__":

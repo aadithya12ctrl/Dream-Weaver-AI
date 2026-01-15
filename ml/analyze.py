@@ -23,6 +23,11 @@ def run_analysis(content):
         "analysis": analysis_results
     }
 
+def run_weekly_analysis(dreams_list):
+    # Process multiple dreams for patterns
+    results = engine.analyze_weekly(dreams_list)
+    return results
+
 if __name__ == "__main__":
     try:
         input_str = sys.stdin.read()
@@ -30,11 +35,17 @@ if __name__ == "__main__":
             sys.exit(0)
             
         data = json.loads(input_str)
-        content = data.get("content", "")
         
-        if content:
-            result = run_analysis(content)
+        # Check if weekly mode
+        if len(sys.argv) > 1 and sys.argv[1] == "weekly":
+            dreams = data.get("dreams", [])
+            result = run_weekly_analysis(dreams)
             print(json.dumps(result))
+        else:
+            content = data.get("content", "")
+            if content:
+                result = run_analysis(content)
+                print(json.dumps(result))
     except Exception as e:
         sys.stderr.write(str(e))
         sys.exit(1)

@@ -62,6 +62,43 @@ export async function registerRoutes(
     res.status(204).send();
   });
 
+  // === WEEKLY ANALYSIS ===
+  app.get("/api/dreams/analysis/weekly", isAuthenticated, async (req, res) => {
+    try {
+      const userId = (req.user as any).claims.sub;
+      const dreams = await storage.getDreams(userId);
+      
+      // Filter last 7 days
+      const lastWeek = new Date();
+      lastWeek.setDate(lastWeek.getDate() - 7);
+      const weeklyDreams = dreams.filter(d => new Date(d.date) >= lastWeek);
+
+      if (weeklyDreams.length === 0) {
+        return res.json({ message: "No dreams recorded this week yet." });
+      }
+
+      const pythonProcess = spawn("python3", [path.join(process.cwd(), "ml/analyze.py"), "weekly"]);
+      let pythonData = "";
+      let pythonError = "";
+
+      pythonProcess.stdin.write(JSON.stringify({ dreams: weeklyDreams }));
+      pythonProcess.stdin.end();
+
+      pythonProcess.stdout.on("data", (data) => pythonData += data.toString());
+      pythonProcess.stderr.on("data", (data) => pythonError += data.toString());
+
+      pythonProcess.on("close", (code) => {
+        if (code !== 0) {
+          console.error("Weekly ML failed:", pythonError);
+          return res.status(500).json({ message: "Weekly analysis failed" });
+        }
+        res.json(JSON.parse(pythonData));
+      });
+    } catch (err) {
+      res.status(500).json({ message: "Server error during weekly analysis" });
+    }
+  });
+
   // === ANALYSIS & ML PIPELINE ===
   
   app.post(api.dreams.analyze.path, isAuthenticated, async (req, res) => {
