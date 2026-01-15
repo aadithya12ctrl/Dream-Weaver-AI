@@ -27,13 +27,7 @@ export default function CreateDream() {
   });
 
   async function onSubmit(data: InsertDream) {
-    // Ensure date is ISO string for backend
-    const submissionData = {
-      ...data,
-      date: new Date(data.date).toISOString(), 
-    };
-    
-    await createDream.mutateAsync(submissionData);
+    await createDream.mutateAsync(data);
     navigate("/journal");
   }
 

@@ -54,7 +54,9 @@ export const analysesRelations = relations(analyses, ({ one }) => ({
 }));
 
 // === SCHEMAS ===
-export const insertDreamSchema = createInsertSchema(dreams).omit({ 
+export const insertDreamSchema = createInsertSchema(dreams, {
+  date: z.string().transform((str) => new Date(str)),
+}).omit({ 
   id: true, 
   createdAt: true, 
   userId: true,
