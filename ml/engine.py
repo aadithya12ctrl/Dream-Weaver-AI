@@ -6,6 +6,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.runnables import RunnablePassthrough
 import json
+from transformers import pipeline
 
 # ============================================================
 # 1. Temporal Pattern Detection (PyTorch LSTM)
@@ -32,6 +33,13 @@ class DreamAnalysisEngine:
             openai_api_key=os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY", "dummy"),
             openai_api_base=os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL")
         )
+
+        # Initialize Hugging Face pipeline for sentiment analysis
+        # Using distilbert-base-uncased-finetuned-sst-2-english as the primary sentiment model
+        try:
+            self.sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+        except:
+            self.sentiment_analyzer = None
         
         # LCEL Chain 1: Symbolic Interpretation
         self.interpretation_prompt = ChatPromptTemplate.from_template("""
@@ -76,7 +84,29 @@ class DreamAnalysisEngine:
         )
 
     def analyze_dream(self, content):
-        return self.analysis_chain.invoke(content)
+        analysis = self.analysis_chain.invoke(content)
+        
+        # Add sentiment score from fine-tuned model
+        if self.sentiment_analyzer:
+            result = self.sentiment_analyzer(content[:512])[0]
+            label = result['label']
+            score = result['score']
+            
+            # Map to Pos/Neg/Neu
+            if label == 'POSITIVE':
+                analysis['sentiment_label'] = 'positive'
+                analysis['sentiment_score'] = int(score * 100)
+            elif label == 'NEGATIVE':
+                analysis['sentiment_label'] = 'negative'
+                analysis['sentiment_score'] = int(-score * 100)
+            else:
+                analysis['sentiment_label'] = 'neutral'
+                analysis['sentiment_score'] = 0
+        else:
+            analysis['sentiment_label'] = 'neutral'
+            analysis['sentiment_score'] = 0
+            
+        return analysis
 
     def analyze_weekly(self, dreams):
         dreams_json = json.dumps(dreams)

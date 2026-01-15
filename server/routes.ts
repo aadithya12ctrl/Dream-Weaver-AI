@@ -171,8 +171,8 @@ export async function registerRoutes(
 
         // Update dream with metadata
         await storage.updateDream(dream.id, {
-          emotion: llmResult.emotion,
-          sentimentScore: llmResult.sentimentScore,
+          emotion: mlAnalysis.sentiment_label || llmResult.emotion,
+          sentimentScore: mlAnalysis.sentiment_score || llmResult.sentimentScore,
           embedding: embedding // Save embedding to dream table
         });
 
