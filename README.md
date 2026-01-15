@@ -1,40 +1,38 @@
 # Oneiros - Advanced AI Dream Journal
 
-Oneiros is a full-stack dream journaling application that leverages a hybrid architecture to combine high-performance web services with advanced machine learning analysis.
+Oneiros is a full-stack dream journaling application that leverages a hybrid architecture to combine high-performance web services with a specialized Python-based Machine Learning analytical engine.
 
-## 🚀 Tech Stack
+## 🧠 Deep AI Architecture
 
-### Backend & API
-- **Node.js & Express**: Handles user authentication, session management, and primary CRUD operations.
-- **PostgreSQL & Drizzle ORM**: Reliable data persistence for user dreams, profiles, and analytical metadata.
-- **Replit Auth**: Seamless OpenID Connect integration for secure user management.
+### 1. Fine-Tuning Transformer Models
+The system employs a custom fine-tuning pipeline for **Large Language Models (LLMs)** and **Encoder-only Transformers** to adapt them for specialized psychological tasks.
+- **Model Architecture**: We utilize **DistilBERT-base-uncased** and **RoBERTa** as base encoders. These are fine-tuned via the `ml/fine_tune.py` script.
+- **Task-Specific Fine-Tuning**:
+    - **Sequence Classification**: Fine-tuned for 3-class emotion detection (Positive, Negative, Neutral) specific to dream narratives.
+    - **Optimization**: Uses the **Hugging Face `Trainer` API** with specialized hyperparameter tuning (Learning Rate: 2e-5, Weight Decay: 0.01) to handle the nuances of subconscious text.
+    - **Datasets**: Employs the **Hugging Face `datasets` library** to tokenize and prepare dream descriptions for training.
 
-### AI/ML Engine (Python)
-The core intelligence of Oneiros is powered by a sophisticated Python-based ML engine located in the `ml/` directory.
+### 2. LangChain LCEL (Expression Language) Orchestration
+The analytical backend uses **LangChain LCEL** to build highly modular, non-linear processing chains. This is the "brain" that connects raw data to psychological insights.
+- **`RunnablePassthrough` & `RunnableParallel`**: Used in `ml/engine.py` to handle concurrent data flows, allowing the system to process symbolic interpretations while simultaneously generating archetypal metadata.
+- **ChatPromptTemplate**: Custom-engineered psychological prompts that enforce strict JSON output formatting, ensuring the frontend receives deterministic data.
+- **`JsonOutputParser`**: Integrates directly into the LCEL chain to automatically validate and parse the LLM's raw response into a structured schema.
+- **Chains Implemented**:
+    - **Symbolic Interpretation Chain**: Transforms dream content into Jungian/Freudian perspectives.
+    - **Weekly Synthesis Chain**: An aggregator that uses LCEL to synthesize multiple dream entries into a single psychological report.
 
-#### 1. LangChain LCEL (Expression Language)
-I implemented a robust orchestration layer using **LangChain LCEL**. This allows for:
-- **Symbolic Interpretation Chains**: Structured pipelines that process raw dream text into Jungian psychological insights.
-- **Weekly Synthesis**: A multi-document aggregation chain that identifies overarching subconscious patterns and emotional climates across multiple dream entries.
-- **Dynamic Prompting**: Context-aware prompts that extract archetypes and triggers with high precision.
+### 3. Neural Temporal Analysis (PyTorch)
+Beyond LLMs, the system utilizes a **Recurrent Neural Network (RNN)** architecture for longitudinal tracking.
+- **LSTM (Long Short-Term Memory)**: A custom PyTorch `DreamTemporalLSTM` module processes sequences of **384-dimensional embeddings** (generated via `all-MiniLM-L6-v2`).
+- **Anomaly Detection**: This model identifies shifts in the "Subconscious Baseline," alerting users to significant psychological triggers or recurring motifs.
 
-#### 2. Hugging Face Transformers
-Applied deep learning expertise by integrating **Hugging Face** for:
-- **Fine-Tuning Pipeline**: A dedicated script (`ml/fine_tune.py`) demonstrating the fine-tuning of pretrained transformer models (e.g., DistilBERT) for dream-specific emotion and sentiment classification.
-- **Inference**: Using state-of-the-art models to generate high-dimensional embeddings and classify complex psychological states.
+## 🚀 Full Tech Stack
 
-#### 3. PyTorch & Temporal Analysis
-- **LSTM Architecture**: Implemented a custom **PyTorch LSTM** model to detect temporal patterns and emotional anomalies in a user's dream sequence over time.
-- **Embeddings**: Utilized `sentence-transformers` to map subconscious content into semantic vector space for advanced similarity search and clustering.
+### Backend
+- **Node.js & Express**: API gateway delegating complex ML tasks to Python via IPC (Inter-Process Communication).
+- **PostgreSQL & Drizzle ORM**: Vector storage (metadata) and relational dream logging.
 
 ### Frontend
-- **React (TypeScript)**: A mystical, dark-themed UI built with performance and aesthetics in mind.
-- **Tailwind CSS & Shadcn/UI**: Modern styling with custom animations and mystical design language.
-- **Framer Motion**: Smooth micro-interactions and transitions to enhance the user experience.
-- **TanStack Query**: Efficient server-state management and real-time data fetching.
-
-## 🧠 Key Features
-- **Deep Psychological Analysis**: Instant symbolic interpretation using Jungian perspectives.
-- **Weekly Psychological Synthesis**: Aggregated insights that reveal long-term subconscious trends.
-- **Archetype Extraction**: Automatic detection of core psychological archetypes.
-- **Emotional Landscape Tracking**: Visualizing emotional shifts using advanced sentiment analysis.
+- **React (TypeScript)**: Mystical dark-themed UI.
+- **TanStack Query**: State synchronization between the web client and the ML engine.
+- **Framer Motion**: Symbolic animation logic.
