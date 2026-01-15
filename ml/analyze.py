@@ -1,37 +1,30 @@
 import sys
 import json
-import random
+import os
+from engine import DreamAnalysisEngine
+from sentence_transformers import SentenceTransformer
 
-# Try to load ML libraries, fallback to mock if missing (Lite env limitation)
+# Re-implementing analyze.py to use the new Engine and LCEL
 try:
-    from sentence_transformers import SentenceTransformer
-    # Load embedding model (Small/Fast)
     model = SentenceTransformer('all-MiniLM-L6-v2')
-    HAS_MODEL = True
+    engine = DreamAnalysisEngine()
 except Exception as e:
-    HAS_MODEL = False
-    sys.stderr.write(f"ML Libs missing, using mock: {str(e)}\n")
+    sys.stderr.write(f"Initialization error: {str(e)}\n")
 
-def analyze(text):
-    if HAS_MODEL:
-        try:
-            embedding = model.encode(text).tolist()
-        except:
-            embedding = [0.1] * 384
-    else:
-        # Dummy embedding (384 dim for MiniLM)
-        # In a real env, we'd ensure deps are installed.
-        embedding = [random.random() for _ in range(384)]
+def run_analysis(content):
+    # 1. Generate Embedding
+    embedding = model.encode(content).tolist()
+    
+    # 2. Run LangChain LCEL Analysis
+    analysis_results = engine.analyze_dream(content)
     
     return {
         "embedding": embedding,
-        "vector_dim": 384,
-        "mock": not HAS_MODEL
+        "analysis": analysis_results
     }
 
 if __name__ == "__main__":
     try:
-        # Read input from Node.js
         input_str = sys.stdin.read()
         if not input_str:
             sys.exit(0)
@@ -40,11 +33,8 @@ if __name__ == "__main__":
         content = data.get("content", "")
         
         if content:
-            result = analyze(content)
+            result = run_analysis(content)
             print(json.dumps(result))
-        else:
-            print(json.dumps({"embedding": []}))
-            
     except Exception as e:
         sys.stderr.write(str(e))
         sys.exit(1)

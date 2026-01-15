@@ -108,10 +108,12 @@ export async function registerRoutes(
         }
 
         let embedding = [];
+        let mlAnalysis = {};
         try {
           if (pythonData) {
             const pyResult = JSON.parse(pythonData);
             embedding = pyResult.embedding || [];
+            mlAnalysis = pyResult.analysis || {};
           }
         } catch (e) {
           console.error("Failed to parse Python output", e);
@@ -120,10 +122,14 @@ export async function registerRoutes(
         // 3. Save Analysis
         const analysis = await storage.createAnalysis({
           dreamId: dream.id,
-          interpretation: llmResult.interpretation || "Analysis failed.",
-          symbols: llmResult.symbols || [],
-          themes: llmResult.themes || [],
-          patterns: { embedding_generated: embedding.length > 0 }, // Store metadata
+          interpretation: mlAnalysis.interpretation || llmResult.interpretation || "Analysis failed.",
+          symbols: mlAnalysis.symbols || llmResult.symbols || [],
+          themes: mlAnalysis.themes || llmResult.themes || [],
+          patterns: { 
+            embedding_generated: embedding.length > 0,
+            archetypes: mlAnalysis.archetypes || [],
+            triggers: mlAnalysis.triggers || []
+          },
         });
 
         // Update dream with metadata
