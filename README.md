@@ -2,7 +2,7 @@
 
 Oneiros is a full-stack dream journaling application that leverages a hybrid architecture to combine high-performance web services with a specialized Python-based Machine Learning analytical engine.
 
-**## 🧠 Deep AI Architecture
+🧠 Deep AI Architecture
 
 ### 1. Fine-Tuning Transformer Models
 The system employs a custom fine-tuning pipeline for **Large Language Models (LLMs)** and **Encoder-only Transformers** to adapt them for specialized psychological tasks.
