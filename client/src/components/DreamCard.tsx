@@ -40,11 +40,19 @@ export function DreamCard({ dream, index = 0 }: DreamCardProps) {
                   {dream.title}
                 </h3>
               </div>
-              {dream.emotion && (
-                <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary capitalize shrink-0">
-                  {dream.emotion}
-                </Badge>
-              )}
+              <div className="flex flex-col items-end gap-2">
+                {dream.emotion && (
+                  <Badge variant="outline" className={cn(
+                    "capitalize shrink-0",
+                    dream.emotion === 'positive' && "bg-green-500/10 border-green-500/20 text-green-400",
+                    dream.emotion === 'negative' && "bg-red-500/10 border-red-500/20 text-red-400",
+                    dream.emotion === 'neutral' && "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                  )}>
+                    {dream.emotion}
+                    {typeof dream.sentimentScore === 'number' && ` (${Math.abs(dream.sentimentScore)}%)`}
+                  </Badge>
+                )}
+              </div>
             </div>
           </CardHeader>
           
