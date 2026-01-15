@@ -4,12 +4,18 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { DreamCard } from "@/components/DreamCard";
 import { EmotionChart } from "@/components/EmotionChart";
-import { Plus, Sparkles, Brain, ArrowRight } from "lucide-react";
+import { Plus, Sparkles, Brain, ArrowRight, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const { data: dreams, isLoading } = useDreams();
+  
+  const { data: weeklyAnalysis, isLoading: isLoadingWeekly } = useQuery({
+    queryKey: ["/api/dreams/analysis/weekly"],
+    enabled: !!dreams && dreams.length > 0,
+  });
 
   if (isLoading) {
     return (
@@ -74,6 +80,54 @@ export default function Dashboard() {
       <div className="container px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content - Recent Dreams */}
         <div className="lg:col-span-2 space-y-8">
+          {/* Weekly Insights Section */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="glass-panel p-8 rounded-3xl border-primary/20 relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <Brain className="w-24 h-24" />
+            </div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-lg bg-primary/10">
+                <TrendingUp className="w-5 h-5 text-primary" />
+              </div>
+              <h2 className="text-2xl font-display font-bold">Weekly Psychological Synthesis</h2>
+            </div>
+            
+            {isLoadingWeekly ? (
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <div className="w-4 h-4 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                Aggregating subconscious patterns...
+              </div>
+            ) : weeklyAnalysis?.synthesis ? (
+              <div className="space-y-6">
+                <p className="text-lg leading-relaxed text-muted-foreground italic">
+                  "{weeklyAnalysis.synthesis}"
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold uppercase tracking-wider text-primary/70">Recurring Archetypes</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {weeklyAnalysis.archetypes?.map((a: string) => (
+                        <span key={a} className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs">
+                          {a}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold uppercase tracking-wider text-blue-400/70">Emotional Climate</h4>
+                    <p className="text-sm text-muted-foreground">{weeklyAnalysis.emotional_climate}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-muted-foreground">Record more dreams this week to unlock deeper psychological patterns.</p>
+            )}
+          </motion.div>
+
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-display font-semibold flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
