@@ -74,7 +74,7 @@ export async function registerRoutes(
       const weeklyDreams = dreams.filter(d => new Date(d.date) >= lastWeek);
 
       if (weeklyDreams.length === 0) {
-        return res.json({ message: "No dreams recorded this week yet." });
+        return res.json({ synthesis: "No dreams recorded this week yet. Record your first dream to unlock weekly insights!", patterns: [], archetypes: [], emotional_climate: "N/A" });
       }
 
       const pythonProcess = spawn("python3", [path.join(process.cwd(), "ml/analyze.py"), "weekly"]);

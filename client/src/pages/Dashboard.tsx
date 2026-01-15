@@ -14,7 +14,7 @@ export default function Dashboard() {
   
   const { data: weeklyAnalysis, isLoading: isLoadingWeekly } = useQuery({
     queryKey: ["/api/dreams/analysis/weekly"],
-    enabled: !!dreams && dreams.length > 0,
+    enabled: !!dreams,
   });
 
   if (isLoading) {
